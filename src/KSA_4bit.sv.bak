@@ -1,0 +1,38 @@
+module KSA_4bit(
+	input logic [3:0] A, B,
+	input logic Cin,
+	output logic [3:0] S,
+	output logic Co
+);
+logic [3:0] P_pre, G_pre, P, G, C_out;
+
+generate
+	genvar i;
+		for(i = 0; i < 4; i = i + 1) begin : generate_Pre_Processing
+			Pre_Processing Pre_Processing_Module(.A(A[i]),.B(B[i]), .P(P_pre[i]), .G(G_pre[i]));
+			end
+endgenerate
+generate 
+	genvar k;
+		for(k = 0; k < 4; k = k + 1) begin : FCO
+			FCO FCO_module(.P(P_pre[i + 1]), .G(G_pre[k + 1]), .Pi(P_pre[i]), .Gi(G_pre[i]), .Po(P[i]),.Go(G[i]));
+		end
+endgenerate
+generate 
+	genvar j;
+
+		for(j = 0; j < 4; j = j + 1) begin : generate_PPC
+			PPC PPC_module(.P(P[i]), .G(G[i]), .Cin(Cin), .Co(C_out[i]));
+		end
+	endgenerate 
+generate
+	genvar v;
+		for (v = 0; v < 4 ; v = v + 1) begin : generate_SUM
+			if(v == 0)
+				assign S[v] = Cin ^ P_pre[v];
+			else
+				assign S[v] = C_out[i-1] ^ Cin;
+	end
+endgenerate
+assign Co = C_out[3];
+endmodule

@@ -1,0 +1,7 @@
+module FCO (
+	input logic P, G, Pi, Gi,
+	output logic Po, Go
+);
+assign Po = Pi & P;
+assign Go = (Gi & P) | G;
+endmodule
